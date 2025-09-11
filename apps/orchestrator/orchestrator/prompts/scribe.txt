@@ -1,0 +1,4 @@
+GÖREV: Son turdan "Notlar" çıkar.
+BÖLÜMLER: Kararlar, Gerekçeler, Riskler, Açık Sorular, Aksiyonlar.
+UZUNLUK: 200–300 kelime, madde madde.
+GİRDİ: {round_messages}

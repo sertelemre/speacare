@@ -1,0 +1,8 @@
+GÖREV: Aşağıdaki konuya {stance_hint} bakışla katkı ver.
+YÖNTEM: (1) İddia (2) Karşı-iddia (3) Kanıt/Kaynak (4) Çelik-adam yaklaşımı (5) Öneri
+KISIT: 150–220 kelime, kısa paragraflar. Kaynak yoksa "varsayım" de.
+PERSONA: {persona_json}
+KAYNAK ÖZETİ: {source_digest}
+KONU: {topic}
+ÖNCEKİ ÖZET: {recent_summary}
+ÇIKTI ETİKETLERİ: stance=[pro|con|neutral], risk_flags=[…]

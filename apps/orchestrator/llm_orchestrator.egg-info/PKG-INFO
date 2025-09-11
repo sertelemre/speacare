@@ -1,0 +1,28 @@
+Metadata-Version: 2.4
+Name: llm_orchestrator
+Version: 0.1.0
+Summary: A service to orchestrate multiple LLM providers for a debate engine.
+Author-email: Jules <jules@example.com>
+Project-URL: Homepage, https://github.com/example/multi-ai-panel
+Project-URL: Issues, https://github.com/example/multi-ai-panel/issues
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: openai>=1.0.0
+Requires-Dist: google-generativeai>=0.4.0
+Requires-Dist: groq>=0.4.0
+Requires-Dist: python-dotenv>=1.0.0
+
+# LLM Orchestrator
+
+This service is responsible for managing interactions with multiple Large Language Model (LLM) providers. It provides a unified interface to call different models and is used by the main API application to power the debate engine.
+
+## Installation
+
+This package is designed to be installed in the same environment as the `api` service. From the root of the monorepo, you can install it in editable mode:
+
+```bash
+pip install -e apps/orchestrator
+```

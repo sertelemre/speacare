@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "llm_orchestrator"
+version = "0.1.0"
+authors = [
+  { name="Jules", email="jules@example.com" },
+]
+description = "A service to orchestrate multiple LLM providers for a debate engine."
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "openai>=1.0.0",
+    "google-generativeai>=0.4.0",
+    "groq>=0.4.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/example/multi-ai-panel"
+"Issues" = "https://github.com/example/multi-ai-panel/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["orchestrator*"]
+exclude = ["tests*"]
