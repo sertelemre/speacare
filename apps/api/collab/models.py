@@ -68,6 +68,14 @@ class Message(models.Model):
     class Meta:
         indexes = [models.Index(fields=['channel', 'created_at'])]
 
+    @property
+    def author_display_name(self):
+        if self.author_type == 'user' and self.author_user:
+            return self.author_user.username
+        if self.author_type == 'bot' and self.author_bot:
+            return self.author_bot.name
+        return "System"
+
 class ThreadMessage(models.Model):
     thread = models.ForeignKey('Thread', on_delete=models.CASCADE, related_name='thread_messages')
     message = models.ForeignKey('Message', on_delete=models.CASCADE, related_name='thread_associations')

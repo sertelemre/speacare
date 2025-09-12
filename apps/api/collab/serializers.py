@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Channel, ChannelMember, ChannelBot, Thread, Message
+from .models import Channel, ChannelMember, ChannelBot, Thread, Message, Vote, Document
 from bots.models import Bot
 from bots.serializers import BotSerializer # Reuse BotSerializer for nested representation
 
@@ -91,3 +91,27 @@ class MessageSerializer(serializers.ModelSerializer):
         read_only_fields = [
             'id', 'channel', 'author_type', 'author_user', 'author_bot', 'created_at'
         ]
+
+
+class VoteSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the Vote model.
+    """
+    voter_bot = serializers.StringRelatedField(read_only=True)
+
+    class Meta:
+        model = Vote
+        fields = ['id', 'message', 'voter_bot', 'value', 'rationale_md', 'created_at']
+        read_only_fields = fields
+
+
+class DocumentSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the Document model.
+    """
+    created_by = serializers.StringRelatedField(read_only=True)
+
+    class Meta:
+        model = Document
+        fields = ['id', 'channel', 'thread', 'title', 'doc_type', 'content_md', 'created_by', 'created_at']
+        read_only_fields = ['id', 'channel', 'thread', 'created_by', 'created_at']

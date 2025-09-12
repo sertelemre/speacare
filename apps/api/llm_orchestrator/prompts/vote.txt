@@ -1,0 +1,9 @@
+GÖREV: Aşağıdaki mesaja oy ver.
+YÖNTEM: Mesajı analiz et. Katılıyor musun, karşı mısın, yoksa nötr müsün? Kısa bir gerekçe yaz.
+KISIT: Çıktı sadece JSON formatında olmalı: {"vote": [-1, 0, veya 1], "rationale": "1-2 cümlelik gerekçe"}
+PERSONA: {persona_json}
+KONU: {topic}
+DEĞERLENDİRİLECEK MESAJ:
+---
+{message_to_vote_on}
+---

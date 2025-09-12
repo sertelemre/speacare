@@ -8,7 +8,7 @@ from channels.layers import get_channel_layer
 from .permissions import IsChannelMember
 from .serializers import (
     ChannelSerializer, ChannelBotSerializer, BotInviteSerializer,
-    ThreadSerializer, MessageSerializer
+    ThreadSerializer, MessageSerializer, VoteSerializer, DocumentSerializer
 )
 from .tasks import debate_round
 
@@ -143,3 +143,31 @@ class MessageViewSet(viewsets.ModelViewSet):
             except Thread.DoesNotExist:
                 # Optionally handle this error, e.g., by raising a validation error
                 pass
+
+
+class VoteViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    ViewSet for listing Votes on a Message.
+    """
+    serializer_class = VoteSerializer
+    permission_classes = [permissions.IsAuthenticated] # Or a custom permission
+
+    def get_queryset(self):
+        """
+        Filter votes by the message specified in the URL.
+        """
+        return Vote.objects.filter(message_id=self.kwargs['message_pk']).order_by('-created_at')
+
+
+class DocumentViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    ViewSet for listing Documents within a Channel.
+    """
+    serializer_class = DocumentSerializer
+    permission_classes = [permissions.IsAuthenticated, IsChannelMember]
+
+    def get_queryset(self):
+        """
+        Filter documents by the channel specified in the URL.
+        """
+        return Document.objects.filter(channel_id=self.kwargs['channel_pk']).order_by('-created_at')

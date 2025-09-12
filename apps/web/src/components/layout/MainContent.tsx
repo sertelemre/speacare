@@ -1,34 +1,65 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useChannelSocket } from '@/hooks/useChannelSocket';
+import { useMessageStore } from '@/store/messageStore';
+import { useQuery } from '@tanstack/react-query';
+import api from '@/lib/api';
+import { Badge } from '@/components/ui/badge'; // Assuming you'll add Badge from shadcn
+
+// Mock channel ID for now
+const CHANNEL_ID = 1;
+
+const fetchMessages = async (channelId: number) => {
+    const { data } = await api.get(`/api/channels/${channelId}/messages/`);
+    return data;
+};
 
 export function MainContent() {
-  // For now, hardcode channel ID 1 to test the WebSocket connection.
-  // In a real app, this would come from the URL or a global state.
-  useChannelSocket(1);
+  useChannelSocket(CHANNEL_ID);
+  const { messages, setMessages } = useMessageStore();
+
+  const { data: initialMessages, isLoading } = useQuery({
+    queryKey: ['messages', CHANNEL_ID],
+    queryFn: () => fetchMessages(CHANNEL_ID),
+    enabled: !!CHANNEL_ID,
+  });
+
+  useEffect(() => {
+    if (initialMessages) {
+      setMessages(initialMessages);
+    }
+  }, [initialMessages, setMessages]);
+
+  const getStanceColor = (stance: string | null) => {
+    switch (stance) {
+      case 'pro': return 'bg-green-500 hover:bg-green-600';
+      case 'con': return 'bg-red-500 hover:bg-red-600';
+      case 'neutral': return 'bg-gray-500 hover:bg-gray-600';
+      default: return 'hidden';
+    }
+  };
 
   return (
-    <main className="flex-1 p-4">
+    <main className="flex-1 p-4 overflow-y-auto">
       <div className="space-y-4">
-        <div className="flex items-start gap-4">
-          <div className="h-10 w-10 flex-shrink-0 rounded-full bg-gray-300 dark:bg-gray-700"></div>
-          <div className="flex-1">
-            <p className="font-semibold">Jules</p>
-            <p className="text-gray-700 dark:text-gray-300">
-              Hey team, what are our thoughts on the new pricing model proposal?
-            </p>
+        {isLoading && <p>Loading messages...</p>}
+        {messages.map((msg) => (
+          <div key={msg.id} className="flex items-start gap-4">
+            <div className={`h-10 w-10 flex-shrink-0 rounded-full ${msg.author_type === 'bot' ? 'bg-blue-300' : 'bg-gray-300'}`}></div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <p className="font-semibold">{msg.author_bot || msg.author_user}</p>
+                {msg.author_type === 'bot' && (
+                  <Badge className={getStanceColor(msg.stance)}>{msg.stance}</Badge>
+                )}
+              </div>
+              <p className="text-gray-700 dark:text-gray-300">
+                {msg.content_md}
+              </p>
+            </div>
           </div>
-        </div>
-        <div className="flex items-start gap-4">
-          <div className="h-10 w-10 flex-shrink-0 rounded-full bg-blue-300 dark:bg-blue-700"></div>
-          <div className="flex-1">
-            <p className="font-semibold">Analyst Bot</p>
-            <p className="text-gray-700 dark:text-gray-300">
-              Based on the provided data, the new model projects a 15% increase in MRR, but it might alienate our enterprise customers. I suggest we run an A/B test on a small segment first.
-            </p>
-          </div>
-        </div>
+        ))}
       </div>
     </main>
   );

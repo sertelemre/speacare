@@ -1,24 +1,23 @@
 import { useEffect, useRef } from 'react';
+import { useMessageStore } from '@/store/messageStore';
+import { useDocumentStore } from '@/store/documentStore';
 
 export function useChannelSocket(channelId: number | null) {
   const ws = useRef<WebSocket | null>(null);
+  const { addMessage } = useMessageStore();
+  const { addDocument } = useDocumentStore();
 
   useEffect(() => {
     if (!channelId) {
       return;
     }
 
-    // This won't work directly because the hook can't get the token from Zustand store
-    // on the server side or in a way that's clean.
-    // A better approach would be to pass the token to the hook or handle auth
-    // via cookies, which Channels' AuthMiddlewareStack can read.
-    // For now, we assume the connection will work for a logged-in user
-    // if the browser has the correct session cookies.
-    // The proper way to pass the JWT is via a query parameter or subprotocol,
-    // but that requires backend changes. Let's proceed with cookies for now.
-
+    // The WebSocket URL needs to include the protocol.
+    // For local dev, it's 'ws'. In production, it would be 'wss'.
+    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const host = window.location.host.replace(':3000', ':8000'); // Dev environment specific
     const socket = new WebSocket(
-      `ws://${window.location.host.replace(':3000', ':8000')}/ws/channel/${channelId}/`
+      `${protocol}://${host}/ws/channel/${channelId}/`
     );
 
     socket.onopen = () => {
@@ -27,9 +26,14 @@ export function useChannelSocket(channelId: number | null) {
     };
 
     socket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      console.log('Received message:', data);
-      // Here, we would update the UI state with the new message
+      const eventData = JSON.parse(event.data);
+      console.log('Received WebSocket event:', eventData);
+
+      if (eventData.type === 'message.new' && eventData.message) {
+        addMessage(eventData.message);
+      } else if (eventData.type === 'doc.new' && eventData.document) {
+        addDocument(eventData.document);
+      }
     };
 
     socket.onclose = () => {

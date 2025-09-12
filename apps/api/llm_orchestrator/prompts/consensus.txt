@@ -1,0 +1,4 @@
+GÖREV: Mesajlar + oy rasyonellerine göre "Uzlaşı Dokümanı" yaz.
+BÖLÜM: Problem, Kabul Edilen Varsayımlar, Karar, Alternatifler, Red Gerekçeleri, Sonraki Adımlar.
+AĞIRLIK: Oylar + uzmanlık uyumu.
+GİRDİ: {messages_and_votes}
