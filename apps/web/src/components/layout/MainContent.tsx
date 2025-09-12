@@ -1,6 +1,13 @@
+"use client";
+
 import React from 'react';
+import { useChannelSocket } from '@/hooks/useChannelSocket';
 
 export function MainContent() {
+  // For now, hardcode channel ID 1 to test the WebSocket connection.
+  // In a real app, this would come from the URL or a global state.
+  useChannelSocket(1);
+
   return (
     <main className="flex-1 p-4">
       <div className="space-y-4">

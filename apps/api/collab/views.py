@@ -3,11 +3,14 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from .models import Channel, ChannelBot, Thread, Message, ThreadMessage
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from .permissions import IsChannelMember
 from .serializers import (
     ChannelSerializer, ChannelBotSerializer, BotInviteSerializer,
     ThreadSerializer, MessageSerializer
 )
+from .tasks import debate_round
 
 class ChannelViewSet(viewsets.ModelViewSet):
     """
@@ -109,7 +112,7 @@ class MessageViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         """
-        Create a new message associated with the channel and the current user.
+        Create a new message, broadcast it via Channels, and trigger a debate round.
         """
         channel = Channel.objects.get(pk=self.kwargs['channel_pk'])
         message = serializer.save(
@@ -118,12 +121,25 @@ class MessageViewSet(viewsets.ModelViewSet):
             channel=channel
         )
 
-        # If a thread_id is provided in the request body, associate the message with it.
+        # Broadcast the new message to the channel group
+        channel_layer = get_channel_layer()
+        message_data = MessageSerializer(message).data
+        async_to_sync(channel_layer.group_send)(
+            f'channel_{channel.id}',
+            {
+                'type': 'message.new',
+                'message': message_data
+            }
+        )
+
+        # If a thread_id is provided, associate the message and trigger debate
         thread_id = self.request.data.get('thread_id')
         if thread_id:
             try:
                 thread = Thread.objects.get(id=thread_id, channel=channel)
                 ThreadMessage.objects.create(thread=thread, message=message)
+                # Trigger the debate round task
+                debate_round.delay(thread.id)
             except Thread.DoesNotExist:
                 # Optionally handle this error, e.g., by raising a validation error
                 pass
