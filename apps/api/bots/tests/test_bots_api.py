@@ -26,7 +26,7 @@ def test_create_bot(api_client):
         "name": "Test Bot",
         "title": "A bot for testing",
         "llm_provider": "openai",
-        "llm_model": "gpt-4",
+            "llm_model": "gpt-4o",
     }
     response = api_client.post(url, data, format='json')
     assert response.status_code == status.HTTP_201_CREATED
