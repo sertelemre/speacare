@@ -5,12 +5,25 @@ import { useChannelSocket } from '@/hooks/useChannelSocket';
 import { useMessageStore } from '@/store/messageStore';
 import { useQuery } from '@tanstack/react-query';
 import api from '@/lib/api';
-import { Badge } from '@/components/ui/badge'; // Assuming you'll add Badge from shadcn
+import { Badge } from '@/components/ui/badge';
+import { useThreadStore } from '@/store/threadStore';
+import { Button } from '@/components/ui/button';
+import { MessageSquareText } from 'lucide-react';
 
 // Mock channel ID for now
 const CHANNEL_ID = 1;
 
-const fetchMessages = async (channelId: number) => {
+interface Message {
+  id: number;
+  author_bot: string | null;
+  author_user: string | null;
+  author_type: 'user' | 'bot' | 'system';
+  content_md: string;
+  stance: string | null;
+  thread_id?: number | null;
+}
+
+const fetchMessages = async (channelId: number): Promise<Message[]> => {
     const { data } = await api.get(`/api/channels/${channelId}/messages/`);
     return data;
 };
@@ -18,8 +31,9 @@ const fetchMessages = async (channelId: number) => {
 export function MainContent() {
   useChannelSocket(CHANNEL_ID);
   const { messages, setMessages } = useMessageStore();
+  const { setActiveThreadId } = useThreadStore();
 
-  const { data: initialMessages, isLoading } = useQuery({
+  const { data: initialMessages, isLoading } = useQuery<Message[]>({
     queryKey: ['messages', CHANNEL_ID],
     queryFn: () => fetchMessages(CHANNEL_ID),
     enabled: !!CHANNEL_ID,
@@ -57,6 +71,12 @@ export function MainContent() {
               <p className="text-gray-700 dark:text-gray-300">
                 {msg.content_md}
               </p>
+              {msg.thread_id && (
+                <Button variant="link" size="sm" className="p-0 h-auto mt-1 text-blue-500" onClick={() => setActiveThreadId(msg.thread_id!)}>
+                  <MessageSquareText className="mr-1 h-4 w-4" />
+                  View Thread
+                </Button>
+              )}
             </div>
           </div>
         ))}

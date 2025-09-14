@@ -76,30 +76,42 @@ function DocumentList() {
 }
 
 
+import { useThreadStore } from '@/store/threadStore';
+import { ThreadView } from './ThreadView';
+
+
 export function RightSidebar() {
+  const { activeThreadId } = useThreadStore();
+
   return (
-    <aside className="w-80 flex-shrink-0 border-l border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-900">
-      <Tabs defaultValue="notes" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="notes">Notes</TabsTrigger>
-          <TabsTrigger value="documents">Documents</TabsTrigger>
-        </TabsList>
-        <TabsContent value="notes">
-            <div className="mt-4">
-                <div className="rounded-lg border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-800">
-                <h3 className="font-semibold">Meeting Summary</h3>
-                <ul className="mt-2 list-disc space-y-1 pl-4 text-sm">
-                    <li>Decision: Proceed with A/B test.</li>
-                    <li>Action: PM to define test segments.</li>
-                    <li>Risk: Potential churn from enterprise clients.</li>
-                </ul>
+    <aside className="w-96 flex-shrink-0 border-l border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-900">
+      {activeThreadId ? (
+        <ThreadView />
+      ) : (
+        <div className="p-4">
+            <Tabs defaultValue="notes" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="notes">Notes</TabsTrigger>
+              <TabsTrigger value="documents">Documents</TabsTrigger>
+            </TabsList>
+            <TabsContent value="notes">
+                <div className="mt-4">
+                    <div className="rounded-lg border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-800">
+                    <h3 className="font-semibold">Meeting Summary</h3>
+                    <ul className="mt-2 list-disc space-y-1 pl-4 text-sm">
+                        <li>Decision: Proceed with A/B test.</li>
+                        <li>Action: PM to define test segments.</li>
+                        <li>Risk: Potential churn from enterprise clients.</li>
+                    </ul>
+                    </div>
                 </div>
-            </div>
-        </TabsContent>
-        <TabsContent value="documents">
-            <DocumentList />
-        </TabsContent>
-      </Tabs>
+            </TabsContent>
+            <TabsContent value="documents">
+                <DocumentList />
+            </TabsContent>
+          </Tabs>
+        </div>
+      )}
     </aside>
   );
 }

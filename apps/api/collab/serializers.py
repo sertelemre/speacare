@@ -81,16 +81,27 @@ class MessageSerializer(serializers.ModelSerializer):
     """
     author_user = serializers.StringRelatedField(read_only=True)
     author_bot = serializers.StringRelatedField(read_only=True)
+    thread_id = serializers.SerializerMethodField()
 
     class Meta:
         model = Message
         fields = [
             'id', 'channel', 'author_type', 'author_user', 'author_bot',
-            'content_md', 'stance', 'reply_to', 'created_at', 'meta_json'
+            'content_md', 'stance', 'reply_to', 'created_at', 'meta_json',
+            'thread_id'
         ]
         read_only_fields = [
-            'id', 'channel', 'author_type', 'author_user', 'author_bot', 'created_at'
+            'id', 'channel', 'author_type', 'author_user', 'author_bot', 'created_at', 'thread_id'
         ]
+
+    def get_thread_id(self, obj):
+        """
+        Get the thread ID if the message is associated with a thread.
+        """
+        association = obj.thread_associations.first()
+        if association:
+            return association.thread.id
+        return None
 
 
 class VoteSerializer(serializers.ModelSerializer):
