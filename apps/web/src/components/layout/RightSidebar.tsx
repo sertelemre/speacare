@@ -5,9 +5,18 @@ import { useQuery } from '@tanstack/react-query';
 import { useDocumentStore } from '@/store/documentStore';
 import api from '@/lib/api';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { FileText, FileCheck2 } from "lucide-react";
 
-// Mock channel ID for now
+// TODO: This should come from a dynamic context, not be hardcoded.
 const CHANNEL_ID = 1;
+
+interface Document {
+    id: number;
+    title: string;
+    doc_type: 'summary' | 'consensus' | string; // Allow other types but specify common ones
+    content_md: string;
+    created_at: string;
+}
 
 const fetchDocuments = async (channelId: number) => {
     // This endpoint doesn't exist yet, we'll need to add it.
@@ -36,13 +45,29 @@ function DocumentList() {
         }
     }, [initialDocs, setDocuments]);
 
+    const getDocIcon = (docType: Document['doc_type']) => {
+        switch (docType) {
+            case 'summary':
+                return <FileText className="h-5 w-5 mr-3 text-blue-500" />;
+            case 'consensus':
+                return <FileCheck2 className="h-5 w-5 mr-3 text-green-500" />;
+            default:
+                return <FileText className="h-5 w-5 mr-3 text-gray-500" />;
+        }
+    }
+
     return (
         <div className="mt-4 space-y-3">
             {isLoading && <p className="text-sm text-gray-500">Loading...</p>}
             {documents.map(doc => (
-                <div key={doc.id} className="rounded-lg border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-800">
-                    <h3 className="font-semibold">{doc.title}</h3>
-                    <p className="mt-1 text-xs text-gray-500">Type: {doc.doc_type}</p>
+                <div key={doc.id} className="rounded-lg border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <div className="flex items-center">
+                        {getDocIcon(doc.doc_type)}
+                        <div>
+                            <h3 className="font-semibold text-sm leading-tight">{doc.doc_type === 'summary' ? 'Round Summary' : 'Consensus Document'}</h3>
+                            <p className="text-xs text-gray-500">{new Date(doc.created_at).toLocaleString()}</p>
+                        </div>
+                    </div>
                 </div>
             ))}
             {!isLoading && documents.length === 0 && <p className="text-sm text-gray-500">No documents yet.</p>}

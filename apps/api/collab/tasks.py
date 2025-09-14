@@ -205,6 +205,9 @@ def summarize_round(thread_id: int, round_message_ids: list[int]):
             {'type': 'doc.new', 'document': doc_data}
         )
 
+        # 6. Trigger the consensus document creation task
+        create_consensus_document.delay(thread_id)
+
     except Thread.DoesNotExist:
         logger.error(f"Thread with id {thread_id} does not exist for summarization.")
     except Exception as e:
@@ -212,9 +215,76 @@ def summarize_round(thread_id: int, round_message_ids: list[int]):
 
 
 @shared_task
-def generate_consensus(thread_id: int):
-    # ... (placeholder)
-    pass
+def create_consensus_document(thread_id: int):
+    """
+    Celery task to use a bot to analyze the full discussion in a thread
+    and generate a consensus and disagreement document.
+    """
+    logger.info(f"Starting consensus document generation for thread_id: {thread_id}")
+
+    try:
+        thread = Thread.objects.select_related('channel').get(id=thread_id)
+        channel = thread.channel
+
+        # 1. Find a suitable bot (e.g., the Scribe) to perform this task.
+        # In a more advanced system, this could be a specific "Facilitator" or "Doc-maker" bot.
+        doc_maker_bot_assignment = ChannelBot.objects.filter(channel=channel, bot__title__in=["Scribe", "Facilitator"]).select_related('bot').first()
+        if not doc_maker_bot_assignment:
+            logger.warning(f"No Scribe or Facilitator bot found in channel {channel.id}. Skipping consensus document.")
+            return
+
+        doc_maker_bot = doc_maker_bot_assignment.bot
+
+        # 2. Get all messages from the thread for full context
+        all_messages = Message.objects.filter(thread_associations__thread=thread).order_by('created_at')
+        discussion_transcript = "\n\n---\n\n".join(
+            [f"**{msg.author_display_name()}**: {msg.content_md}" for msg in all_messages]
+        )
+
+        # 3. Call orchestrator with consensus prompt
+        with open('apps/orchestrator/orchestrator/prompts/consensus_builder.txt', 'r') as f:
+            consensus_prompt_template = f.read()
+
+        consensus_prompt = consensus_prompt_template.format(
+            discussion_topic=thread.topic,
+            discussion_transcript=discussion_transcript
+        )
+
+        consensus_content = router.call_llm(
+            provider=doc_maker_bot.llm_provider,
+            model=doc_maker_bot.llm_model,
+            system_prompt="You are a neutral facilitator summarizing a debate. Follow the user's instructions precisely.",
+            messages=[{'role': 'user', 'content': consensus_prompt}],
+            temperature=0.4,
+        )
+
+        if not consensus_content or "Error:" in consensus_content:
+            logger.error(f"Bot {doc_maker_bot.name} failed to generate a consensus doc for thread {thread_id}.")
+            return
+
+        # 4. Save the consensus as a new Document
+        consensus_doc = Document.objects.create(
+            channel=channel,
+            thread=thread,
+            title=f"Consensus Document for: {thread.topic}",
+            doc_type='consensus',
+            content_md=consensus_content,
+            created_by=doc_maker_bot.created_by
+        )
+        logger.info(f"Consensus document {consensus_doc.id} created for thread {thread_id}.")
+
+        # 5. Broadcast the new document
+        channel_layer = get_channel_layer()
+        doc_data = DocumentSerializer(consensus_doc).data
+        async_to_sync(channel_layer.group_send)(
+            f'channel_{channel.id}',
+            {'type': 'doc.new', 'document': doc_data}
+        )
+
+    except Thread.DoesNotExist:
+        logger.error(f"Thread with id {thread_id} does not exist for consensus generation.")
+    except Exception as e:
+        logger.error(f"An unexpected error occurred in create_consensus_document for thread {thread_id}: {e}", exc_info=True)
 
 @shared_task
 def refresh_bot_sources(bot_id: int):
