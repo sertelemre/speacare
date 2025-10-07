@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { useAuthStore } from "@/store/auth";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,26 +15,36 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { useAuthStore } from "@/store/auth";
 
 export function LoginForm() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
-  const { setTokens } = useAuthStore();
+  const { setTokens, setUser } = useAuthStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/jwt/obtain/`,
+        `http://localhost:8002/api/auth/jwt/obtain/`,
         { username, password }
       );
       const { access, refresh } = response.data;
       setTokens(access, refresh);
-      // You might want to fetch user details here as well and store them
+      
+      // Fetch user details and store them
+      try {
+        const userResponse = await axios.get(
+          `http://localhost:8002/api/auth/user/`,
+          { headers: { Authorization: `Bearer ${access}` } }
+        );
+        setUser(userResponse.data);
+      } catch (userErr) {
+        console.warn('Failed to fetch user details:', userErr);
+      }
+      
       router.push("/"); // Redirect to the main app page
     } catch (err) {
       setError("Failed to login. Please check your credentials.");

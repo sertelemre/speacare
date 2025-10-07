@@ -17,6 +17,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -24,26 +25,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
+import { Bot } from '@/store/botStore';
 import api from '@/lib/api';
 
 // Define the schema for the form validation
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   title: z.string().min(5, { message: "Title must be at least 5 characters." }),
-  llm_provider: z.string({ required_error: "Please select a provider." }),
-  llm_model: z.string({ required_error: "Please select a model." }),
+  character: z.string().min(10, { message: "Character description must be at least 10 characters." }),
+  job_description: z.string().min(10, { message: "Job description must be at least 10 characters." }),
+  llm_provider: z.string().min(1, "Please select a provider."),
+  llm_model: z.string().min(1, "Please select a model."),
+  temperature: z.number().min(0).max(2),
+  color: z.string().regex(/^#[0-9A-F]{6}$/i, "Please select a valid color."),
 });
 
 type FormValues = z.infer<typeof formSchema>;
-
-// Define the types for the component props
-interface Bot {
-  id: number;
-  name: string;
-  title: string;
-  llm_provider: string;
-  llm_model: string;
-}
 
 interface LLMProviders {
     [provider: string]: {
@@ -76,8 +74,12 @@ export const BotForm: React.FC<BotFormProps> = ({ bot, onSuccess }) => {
     defaultValues: {
       name: bot?.name || "",
       title: bot?.title || "",
+      character: bot?.character || "",
+      job_description: bot?.job_description || "",
       llm_provider: bot?.llm_provider || "",
       llm_model: bot?.llm_model || "",
+      temperature: bot?.temperature || 0.7,
+      color: bot?.color || "#3B82F6",
     },
   });
 
@@ -92,12 +94,33 @@ export const BotForm: React.FC<BotFormProps> = ({ bot, onSuccess }) => {
 
   const onSubmit = async (values: FormValues) => {
     try {
+      // Generate system prompt from character and job description
+      const systemPrompt = `You are ${values.name}, ${values.title}.
+
+Character: ${values.character}
+
+Job Description: ${values.job_description}
+
+Instructions:
+- Stay in character as ${values.name}
+- Follow your job description and role
+- Be helpful, engaging, and conversational
+- Provide thoughtful responses based on your character and expertise
+- Challenge ideas when appropriate to find weaknesses or improvements
+
+Remember: You are ${values.name}, not just a generic AI assistant.`;
+
+      const botData = {
+        ...values,
+        system_prompt: systemPrompt,
+      };
+
       if (isEditMode && bot) {
         // Update existing bot
-        await api.put(`/api/bots/${bot.id}/`, values);
+        await api.put(`/api/bots/${bot.id}/`, botData);
       } else {
         // Create new bot
-        await api.post('/api/bots/', values);
+        await api.post('/api/bots/', botData);
       }
       onSuccess(); // Trigger callback to close modal and refetch list
     } catch (error) {
@@ -132,11 +155,47 @@ export const BotForm: React.FC<BotFormProps> = ({ bot, onSuccess }) => {
           name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Bot Title / Persona</FormLabel>
+              <FormLabel>Bot Title / Role</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., Challenges ideas to find weaknesses" {...field} />
+                <Input placeholder="e.g., Devil's Advocate, Risk Analyst, Creative Writer" {...field} />
               </FormControl>
-              <FormDescription>A brief description of the bot's role or personality.</FormDescription>
+              <FormDescription>A brief description of the bot&apos;s role or expertise area.</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="character"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Character Description</FormLabel>
+              <FormControl>
+                <Textarea 
+                  placeholder="Describe the bot's personality, background, communication style, and unique traits..."
+                  className="min-h-[100px]"
+                  {...field} 
+                />
+              </FormControl>
+              <FormDescription>Define the bot&apos;s personality, background, and how they communicate.</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="job_description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Job Description & Expertise</FormLabel>
+              <FormControl>
+                <Textarea 
+                  placeholder="Describe what the bot does, their expertise areas, responsibilities, and how they approach problems..."
+                  className="min-h-[100px]"
+                  {...field} 
+                />
+              </FormControl>
+              <FormDescription>Define the bot&apos;s professional role, expertise, and approach to tasks.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -182,6 +241,66 @@ export const BotForm: React.FC<BotFormProps> = ({ bot, onSuccess }) => {
                 </SelectContent>
               </Select>
               <FormDescription>Select a provider first.</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="color"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Bot Color</FormLabel>
+              <FormControl>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={field.value}
+                      onChange={(e) => field.onChange(e.target.value)}
+                      className="w-12 h-8 rounded border border-gray-300 cursor-pointer"
+                    />
+                    <Input
+                      value={field.value}
+                      onChange={(e) => field.onChange(e.target.value)}
+                      placeholder="#3B82F6"
+                      className="w-24"
+                    />
+                  </div>
+                  <div 
+                    className="w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center text-white font-semibold text-sm"
+                    style={{ backgroundColor: field.value }}
+                  >
+                    {bot?.name?.charAt(0).toUpperCase() || 'B'}
+                  </div>
+                </div>
+              </FormControl>
+              <FormDescription>
+                Choose a color for your bot's avatar. This will be displayed in chat and bot lists.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="temperature"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Temperature: {field.value}</FormLabel>
+              <FormControl>
+                <Slider
+                  min={0}
+                  max={2}
+                  step={0.1}
+                  value={[field.value]}
+                  onValueChange={(value) => field.onChange(value[0])}
+                  className="w-full"
+                />
+              </FormControl>
+              <FormDescription>
+                Controls randomness: 0 = deterministic, 2 = very creative. Recommended: 0.7-0.9 for creative bots, 0.3-0.5 for analytical bots.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}

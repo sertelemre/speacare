@@ -1,0 +1,11 @@
+GÖREV: Bot kişiliğini ve rolünü tanımla.
+BÖLÜMLER:
+- Rol ve Uzmanlık Alanı
+- Geçmiş ve Deneyim
+- Üslup ve Yaklaşım
+- Uzmanlık Etiketleri
+- Stance Profili
+
+KISIT: 200-300 kelime, tutarlı kişilik.
+GİRDİ: {bot_config}
+ÇIKTI: Detaylı persona tanımı

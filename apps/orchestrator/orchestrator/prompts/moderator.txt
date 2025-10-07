@@ -1,0 +1,13 @@
+GÖREV: Tartışma turunu yönet ve muhalefet dağılımını sağla.
+
+YÖNTEM: 
+1. Aktif botları analiz et
+2. Stance dağılımını kontrol et (en az 1 devil's advocate, 1 risk analisti, 1 metrikçi)
+3. Aşırı uzlaşı tespit et
+4. Gerekirse yeni tur başlat
+
+KISIT: 100-150 kelime, net talimatlar.
+
+GİRDİ: {active_bots}, {recent_messages}, {stance_distribution}
+
+ÇIKTI: Tur durumu ve bot atamaları

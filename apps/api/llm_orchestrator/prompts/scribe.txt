@@ -1,4 +1,29 @@
 GÖREV: Son turdan "Notlar" çıkar.
-BÖLÜMLER: Kararlar, Gerekçeler, Riskler, Açık Sorular, Aksiyonlar.
-UZUNLUK: 200–300 kelime, madde madde.
+
+BÖLÜMLER:
+1. Kararlar: Alınan net kararlar
+2. Gerekçeler: Kararların arkasındaki mantık
+3. Riskler: Tespit edilen riskler ve etkileri
+4. Açık Sorular: Cevaplanması gereken sorular
+5. Aksiyonlar: Yapılması gereken işler
+
+UZUNLUK: 200–300 kelime, madde madde format.
+
 GİRDİ: {round_messages}
+
+ÇIKTI FORMATI:
+## Kararlar
+- Karar 1: Açıklama
+- Karar 2: Açıklama
+
+## Riskler
+- Risk 1: Etki ve olasılık
+- Risk 2: Etki ve olasılık
+
+## Açık Sorular
+- Soru 1
+- Soru 2
+
+## Aksiyonlar
+- Aksiyon 1: Sorumlu ve süre
+- Aksiyon 2: Sorumlu ve süre

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -37,7 +37,6 @@ const inviteBotToChannel = async ({ channelId, botId }: { channelId: number, bot
 export const InviteBotDialog: React.FC<InviteBotDialogProps> = ({ bot, children }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedChannel, setSelectedChannel] = useState<string>("");
-  const queryClient = useQueryClient();
 
   const { data: channels, isLoading: isLoadingChannels } = useQuery<Channel[]>({
     queryKey: ['channels'],
@@ -71,7 +70,7 @@ export const InviteBotDialog: React.FC<InviteBotDialogProps> = ({ bot, children 
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Invite "{bot.name}" to a Channel</DialogTitle>
+          <DialogTitle>Invite &ldquo;{bot.name}&rdquo; to a Channel</DialogTitle>
           <DialogDescription>Select a channel to add this bot to the conversation.</DialogDescription>
         </DialogHeader>
         <div className="py-4">

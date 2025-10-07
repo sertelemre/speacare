@@ -1,4 +1,37 @@
 GÖREV: Mesajlar + oy rasyonellerine göre "Uzlaşı Dokümanı" yaz.
-BÖLÜM: Problem, Kabul Edilen Varsayımlar, Karar, Alternatifler, Red Gerekçeleri, Sonraki Adımlar.
-AĞIRLIK: Oylar + uzmanlık uyumu.
+
+BÖLÜMLER:
+1. Problem: Tanımlanan problem ve kapsamı
+2. Kabul Edilen Varsayımlar: Üzerinde uzlaşılan varsayımlar
+3. Karar: Alınan ana karar ve gerekçeleri
+4. Alternatifler: Değerlendirilen alternatifler
+5. Red Gerekçeleri: Reddedilen seçeneklerin nedenleri
+6. Sonraki Adımlar: Uygulama planı ve sorumluluklar
+
+AĞIRLIK: Oylar + uzmanlık uyumu + risk değerlendirmesi.
+
 GİRDİ: {messages_and_votes}
+
+ÇIKTI FORMATI:
+# Uzlaşı Dokümanı
+
+## Problem
+Problem tanımı ve kapsamı.
+
+## Kabul Edilen Varsayımlar
+- Varsayım 1
+- Varsayım 2
+
+## Karar
+Ana karar ve gerekçeleri.
+
+## Alternatifler
+- Alternatif 1: Artı/eksi
+- Alternatif 2: Artı/eksi
+
+## Red Gerekçeleri
+- Reddedilen seçenek: Neden
+
+## Sonraki Adımlar
+- Adım 1: Sorumlu ve süre
+- Adım 2: Sorumlu ve süre

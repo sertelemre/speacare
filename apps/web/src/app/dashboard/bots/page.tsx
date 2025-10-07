@@ -13,14 +13,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { BotForm } from '@/components/bots/BotForm';
 import { InviteBotDialog } from '@/components/bots/InviteBotDialog';
 import { MessageSquarePlus } from 'lucide-react';
-
-interface Bot {
-  id: number;
-  name: string;
-  title: string;
-  llm_provider: string;
-  llm_model: string;
-}
+import { Bot } from '@/store/botStore';
 
 const fetchBots = async (): Promise<Bot[]> => {
   const { data } = await api.get('/api/bots/');
@@ -134,7 +127,7 @@ const BotsPage = () => {
         {!isLoading && !error && bots?.length === 0 && (
           <div className="text-center py-12 border-2 border-dashed rounded-lg">
               <h3 className="text-lg font-medium">No Bots Found</h3>
-              <p className="text-sm text-gray-500 mt-1">You haven't created any bots yet.</p>
+              <p className="text-sm text-gray-500 mt-1">You haven&apos;t created any bots yet.</p>
               <Button className="mt-4" onClick={handleCreateClick}>
                 <PlusCircle className="mr-2 h-4 w-4" />
                 Create Your First Bot

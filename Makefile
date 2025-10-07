@@ -18,8 +18,8 @@ down:
 
 test:
 	@echo "Running tests..."
-	# This will be configured to run pytest for the api
-	# and playwright for the web app.
+	cd apps/api && python3 -m pytest
+	cd apps/web && npm run test
 
 # ==============================================================================
 # DATABASE
@@ -27,4 +27,9 @@ test:
 
 migrate:
 	@echo "Running database migrations..."
-	# This will be configured to run Django migrations.
+	cd apps/api && python3 manage.py makemigrations
+	cd apps/api && python3 manage.py migrate
+
+seed:
+	@echo "Seeding database with initial data..."
+	cd apps/api && python3 manage.py seed_data

@@ -17,6 +17,7 @@ urlpatterns = [
     # App endpoints
     path('api/bots/', include('bots.urls')),
     path('api/', include('collab.urls')),
+    path('api/', include('sources.urls')),
 
     # API Schema
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),

@@ -2,16 +2,14 @@ import { AuthGuard } from "@/components/auth/AuthGuard";
 import { LeftSidebar } from "@/components/layout/LeftSidebar";
 import { MainContent } from "@/components/layout/MainContent";
 import { RightSidebar } from "@/components/layout/RightSidebar";
-import { TopBar } from "@/components/layout/TopBar";
 
 export default function HomePage() {
   return (
     <AuthGuard>
-      <div className="flex h-screen w-full bg-white dark:bg-gray-950">
+      <div className="flex h-screen w-full bg-white dark:bg-gray-950 overflow-hidden">
         <LeftSidebar />
-        <div className="flex flex-1 flex-col">
-          <TopBar />
-          <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-1 flex-col min-h-0">        
+          <div className="flex flex-1 min-h-0">
             <MainContent />
             <RightSidebar />
           </div>

@@ -11,6 +11,8 @@ class Bot(models.Model):
 
     name = models.CharField(max_length=255)
     title = models.CharField(max_length=255)
+    character = models.TextField(blank=True, help_text="Bot's personality, background, and communication style")
+    job_description = models.TextField(blank=True, help_text="Bot's professional role, expertise, and responsibilities")
     persona_json = models.JSONField(default=dict)
     llm_provider = models.CharField(max_length=100)
     llm_model = models.CharField(max_length=100)
@@ -19,6 +21,7 @@ class Bot(models.Model):
     background = models.TextField(blank=True)
     expertise_tags = models.JSONField(default=list)
     stance_profile = models.CharField(max_length=20, choices=STANCE_CHOICES, default='neutral')
+    color = models.CharField(max_length=7, default='#3B82F6', help_text="Hex color code for bot avatar")
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='bots')
     created_at = models.DateTimeField(auto_now_add=True)
 

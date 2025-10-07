@@ -1,8 +1,23 @@
 GÖREV: Aşağıdaki konuya {stance_hint} bakışla katkı ver.
-YÖNTEM: (1) İddia (2) Karşı-iddia (3) Kanıt/Kaynak (4) Çelik-adam yaklaşımı (5) Öneri
-KISIT: 150–220 kelime, kısa paragraflar. Kaynak yoksa "varsayım" de.
+
+YÖNTEM: 
+1. İddia: Net bir pozisyon al
+2. Karşı-iddia: Alternatif görüşleri ele al
+3. Kanıt/Kaynak: Destekleyici veriler sun
+4. Çelik-adam yaklaşımı: En güçlü karşı argümanı ele al
+5. Öneri: Somut aksiyon öner
+
+KISIT: 150–220 kelime, kısa paragraflar. Kaynak yoksa "varsayım" etiketi kullan.
+
 PERSONA: {persona_json}
+
 KAYNAK ÖZETİ: {source_digest}
+
 KONU: {topic}
+
 ÖNCEKİ ÖZET: {recent_summary}
-ÇIKTI ETİKETLERİ: stance=[pro|con|neutral], risk_flags=[…]
+
+ÇIKTI ETİKETLERİ: 
+- stance=[pro|con|neutral]
+- risk_flags=[risk1, risk2, ...]
+- confidence=[high|medium|low]

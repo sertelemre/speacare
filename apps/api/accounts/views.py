@@ -28,6 +28,17 @@ class MeView(generics.RetrieveAPIView):
         return self.request.user
 
 
+class UserView(generics.RetrieveAPIView):
+    """
+    View to retrieve the authenticated user's details.
+    """
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
+
+
 class AuthExchangeView(APIView):
     """
     Placeholder view for exchanging a NextAuth JWT for an API JWT.

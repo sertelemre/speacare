@@ -16,6 +16,8 @@ class BotSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'title',
+            'character',
+            'job_description',
             'persona_json',
             'llm_provider',
             'llm_model',
@@ -24,6 +26,7 @@ class BotSerializer(serializers.ModelSerializer):
             'background',
             'expertise_tags',
             'stance_profile',
+            'color',
             'created_by',
             'created_at',
         ]
